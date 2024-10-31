@@ -1,0 +1,65 @@
+name: Publish to NPM
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
+        run: npm run build
+
+      - name: Validate changes and prepare release
+        run: |
+          # Si des modifications existent, les valider
+          if [[ $(git status --porcelain) ]]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "CI/CD: Commit changes before release"
+          fi
+
+      - name: Set npm authentication
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Check and bump version if necessary
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          PUBLISHED_VERSION=$(npm show $(node -p "require('./package.json').name") version)
+
+          if [ "$CURRENT_VERSION" == "$PUBLISHED_VERSION" ]; then
+            echo "La version $CURRENT_VERSION existe déjà sur NPM. Incrémentation de la version."
+            npm version patch -m "CI/CD: New release version %s [skip ci]" --no-git-tag-version
+          else
+            echo "La version $CURRENT_VERSION n'existe pas encore sur NPM. Prêt pour la publication."
+          fi
+
+      - name: Bump version and publish
+        run: |
+          npm version patch -m "CI/CD: New release version %s [skip ci]"
+          npm publish --access public
+
+      - name: Push changes
+        run: |
+          git push --follow-tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

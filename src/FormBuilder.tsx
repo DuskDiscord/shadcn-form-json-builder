@@ -4,16 +4,9 @@ import {AutoForm} from "@/main.ts"
 
 const FormBuilder = () => {
 
-    const defaultValuesOverride = [
-        {
-            name: "item_one",
-            value: "Value override"
-        },
-        {
-            name: "item_two",
-            value: "12/12/2024"
-        }
-    ]
+    const defaultValuesOverride = {
+        item_two: "12/12/2024"
+    }
 
     const objectPlaceholder = {
         title: "Application Form Title",
@@ -82,7 +75,7 @@ const FormBuilder = () => {
                                 </div>
                                 <div className="lg:col-span-6 order-1 lg:order-2">
                                     <AutoForm jsonInput={jsonInput} onSubmit={(data) => console.log("data", data)}
-                                              defaultValues={defaultValuesOverride}/>
+                                              defaultValues={defaultValuesOverride} />
                                 </div>
                             </div>
                         </div>

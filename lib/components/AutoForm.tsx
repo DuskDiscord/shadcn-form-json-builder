@@ -5,12 +5,14 @@ import {useForm} from "react-hook-form"
 import React from 'react'
 import {FormBloc, FormI, TypeEffect} from "./types.ts"
 import {BlocComponent} from "@/components/BlocComponent.tsx"
+import {Loader2} from "lucide-react";
 
 interface FormRendererProps {
     jsonInput: string
-    defaultValues?: { name: string, value: string }[]
+    defaultValues?: { [key:string]: string | number | boolean | undefined }
     components?: FormComponentsProps
     onSubmit: (data: FormI) => void
+    isLoading?: boolean
     SubmitButton?: React.ElementType
 }
 
@@ -27,15 +29,13 @@ const hashCode = (s: string) =>
         return a & a
     }, 0)
 
-const AutoForm = ({jsonInput, components, onSubmit, SubmitButton, defaultValues}: FormRendererProps) => {
+const AutoForm = ({jsonInput, components, onSubmit, SubmitButton, defaultValues, isLoading}: FormRendererProps) => {
     const parseAndInjectDefaults = () => {
         try {
             const json = JSON.parse(jsonInput)
-            defaultValues?.forEach(({name, value}) => {
-                const bloc = json.inputs.find((bloc: FormBloc) => bloc.name === name)
-                if (bloc) {
-                    bloc.defaultValue = value
-                }
+            defaultValues && Object.keys(defaultValues).forEach((key) => {
+                const bloc = json.inputs.find((bloc: FormBloc) => bloc.name === key)
+                if (bloc) bloc.defaultValue = defaultValues[key]
             })
             return json
         } catch {
@@ -97,7 +97,8 @@ const AutoForm = ({jsonInput, components, onSubmit, SubmitButton, defaultValues}
                     {SubmitButton ? (
                         <SubmitButton/>
                     ) : (
-                        <Button type="submit" variant="outline" className="float-end mt-5">
+                        <Button type="submit" variant="outline" className="float-end mt-5" disabled={isLoading}>
+                            {isLoading && <Loader2 className="animate-spin" />}
                             Valider
                         </Button>
                     )}

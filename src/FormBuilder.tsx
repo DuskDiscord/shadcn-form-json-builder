@@ -47,7 +47,13 @@ const FormBuilder = () => {
                 name: "item_five",
                 label: "Switch Label",
                 type: "SWITCH",
-                description: "Description select"
+                description: "Description switch"
+            },
+            {
+                name: "item_six",
+                label: "Checbox Label",
+                type: "CHECKBOX",
+                description: "Description checkbox"
             }
         ]
     }

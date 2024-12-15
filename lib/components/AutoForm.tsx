@@ -21,6 +21,7 @@ export interface FormComponentsProps {
     Textarea?: React.ElementType
     Select?: React.ElementType
     Switch?: React.ElementType
+    CheckBox?: React.ElementType
 }
 
 const hashCode = (s: string) =>

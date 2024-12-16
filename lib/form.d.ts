@@ -20,6 +20,7 @@ export enum TypeEnum {
     TEXT_AREA = "TEXT_AREA",
     SELECT = "SELECT",
     SWITCH = "SWITCH",
+    CHECKBOX = "CHECKBOX",
 }
 
 export enum TypeEffect {

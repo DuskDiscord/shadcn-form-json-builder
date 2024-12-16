@@ -6,6 +6,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Switch} from "@/components/ui/switch.tsx"
 import {FormControl, FormDescription, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx"
 import {FormComponentsProps} from "@/components/AutoForm.tsx"
+import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 export const BlocComponent = ({field, bloc, components, uuid}: {
     bloc: FormBloc
@@ -18,6 +19,7 @@ export const BlocComponent = ({field, bloc, components, uuid}: {
         Textarea: CustomTextarea = Textarea,
         Select: CustomSelect = Select,
         Switch: CustomSwitch = Switch,
+        CheckBox: CustomCheckBox = Checkbox,
     } = {...components}
 
     switch (bloc.type) {
@@ -81,7 +83,7 @@ export const BlocComponent = ({field, bloc, components, uuid}: {
                 <FormMessage/>
             </FormItem>
         case TypeEnum.SWITCH:
-            return <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            return <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 mb-4">
                 <div className="space-y-0.5">
                     <FormLabel htmlFor={uuid} className="text-base">
                         {bloc.label}
@@ -92,6 +94,25 @@ export const BlocComponent = ({field, bloc, components, uuid}: {
                 </div>
                 <FormControl>
                     <CustomSwitch
+                        id={uuid}
+                        disabled={bloc.effect === TypeEffect.DISABLED}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                    />
+                </FormControl>
+            </FormItem>
+        case TypeEnum.CHECKBOX:
+            return <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 ">
+                <div className="space-y-0.5">
+                    <FormLabel htmlFor={uuid} className="text-base">
+                        {bloc.label}
+                    </FormLabel>
+                    <FormDescription>
+                        {bloc.description}
+                    </FormDescription>
+                </div>
+                <FormControl>
+                    <CustomCheckBox
                         id={uuid}
                         disabled={bloc.effect === TypeEffect.DISABLED}
                         checked={field.value}

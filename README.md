@@ -77,6 +77,7 @@ The form supports the following field types:
 - TEXT_AREA: Text area
 - SELECT: Dropdown menu
 - SWITCH: On/Off switch for options
+- CHECKBOX: Checkbox field
 
 ### Configuration JSON
 

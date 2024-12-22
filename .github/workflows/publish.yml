@@ -28,14 +28,18 @@ jobs:
       - name: Run build
         run: npm run build
 
+      - name: Set git user for CI
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Validate changes and prepare release
         run: |
           # Si des modifications existent, les valider
           if [[ $(git status --porcelain) ]]; then
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git add .
             git commit -m "CI/CD: Commit changes before release"
+            git push
           fi
 
       - name: Set npm authentication
@@ -48,6 +52,18 @@ jobs:
 
           if [ "$CURRENT_VERSION" == "$PUBLISHED_VERSION" ]; then
             echo "La version $CURRENT_VERSION existe déjà sur NPM. Incrémentation de la version."
+
+            # Vérifiez si des modifications ont été faites (par exemple dans package.json ou package-lock.json)
+            git diff --exit-code || echo "Modifications détectées"
+          
+            # Si des modifications existent, effectuer le commit et push
+            if [[ $(git status --porcelain) ]]; then
+              git add .
+              git commit -m "CI/CD: Commit changes before version bump"
+              git push
+            fi
+
+            # Bump la version sans créer de tag git
             npm version patch -m "CI/CD: New release version %s [skip ci]" --no-git-tag-version
           else
             echo "La version $CURRENT_VERSION n'existe pas encore sur NPM. Prêt pour la publication."
@@ -55,11 +71,10 @@ jobs:
 
       - name: Bump version and publish
         run: |
-          npm version patch -m "CI/CD: New release version %s [skip ci]"
+          # Assurez-vous que l'utilisateur git est configuré
+          git add .
+          git commit -m "CI/CD: Commit version bump"
+          git push --follow-tags
+
           npm publish --access public
 
-      - name: Push changes
-        run: |
-          git push --follow-tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
